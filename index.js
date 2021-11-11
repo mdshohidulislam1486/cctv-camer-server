@@ -21,6 +21,7 @@ async function  run(){
         console.log('conneted to database')
         const database = client.db('cctvCamera')
         const cctvCollection = database.collection('cctv')
+        const usersCollcectiion=database.collection('users')
 
         // post api
 
@@ -32,6 +33,44 @@ async function  run(){
             const result = await cctvCollection.insertOne(cctv)
             console.log(result)
         })
+
+        app.get('/users/:email', async (req, res)=>{
+            const email = req.params.email
+            const query ={email:email}
+            const user = await usersCollcectiion.findOne(query)
+            let isAdmin= false;
+            if(user.role ==='admin'){
+              isAdmin= true;
+            }
+            res.json({admin:isAdmin})
+          })
+
+           //  post user data 
+        app.post('/users', async (req, res)=>{
+            const user = req.body;
+            const result = await usersCollcectiion.insertOne(user)
+            console.log(result)
+            res.json(result);
+        })
+
+        app.put('/users', async (req, res)=>{
+            const user = req.body;
+            const filter = {email: user.email}
+            const options ={upsert:true}
+            const updateDoc = {$set: user}
+            const result = await usersCollcectiion.updateOne(filter, updateDoc, options)
+            res.json(result)
+          })
+
+          app.put('/users/admin', async (req, res)=>{
+            const user = req.body;
+            const filter = {email: user.email};
+            const updateDoc = {$set:{role:'admin'}}
+            const result = await usersCollcectiion.updateOne(filter, updateDoc)
+            res.json(result)
+          })
+      
+
     }
     finally{
         // await client.close();
