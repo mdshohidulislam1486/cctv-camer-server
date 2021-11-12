@@ -25,13 +25,20 @@ async function  run(){
 
         // post api
 
-        app.post('/cctv', async (req, res)=>{
+        /* app.post('/cctv', async (req, res)=>{
             const cctv = {
                 "name":'Eighteen Century'
 
             }
             const result = await cctvCollection.insertOne(cctv)
             console.log(result)
+        }) */
+
+        // get all cctv collection 
+        app.get('/cctv', async(req, res)=>{
+            const cursor = cctvCollection.find({});
+            const cctv = await cursor.toArray()
+            res.send(cctv)
         })
 
         app.get('/users/:email', async (req, res)=>{
