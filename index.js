@@ -22,17 +22,7 @@ async function  run(){
         const database = client.db('cctvCamera')
         const cctvCollection = database.collection('cctv')
         const usersCollcectiion=database.collection('users')
-
-        // post api
-
-        /* app.post('/cctv', async (req, res)=>{
-            const cctv = {
-                "name":'Eighteen Century'
-
-            }
-            const result = await cctvCollection.insertOne(cctv)
-            console.log(result)
-        }) */
+        const orderCollection = database.collection('orders')
 
         // get all cctv collection 
         app.get('/cctv', async(req, res)=>{
@@ -41,18 +31,40 @@ async function  run(){
             res.send(cctv)
         })
 
-        app.get('/users/:email', async (req, res)=>{
-            const email = req.params.email
-            const query ={email:email}
-            const user = await usersCollcectiion.findOne(query)
-            let isAdmin= false;
-            if(user.role ==='admin'){
-              isAdmin= true;
-            }
-            res.json({admin:isAdmin})
-          })
+        // POST new orders 
+        app.post('/orders', async(req, res)=>{
+            const order = req.body
+            order.createdAt = new Date();
+            const result = await orderCollection.insertOne(order)
+            res.json(result)
+        })
 
-           //  post user data 
+        // add new cctv collection 
+        app.post('/cctv', async (req, res)=>{
+            const service = req.body;
+            const result = await cctvCollection.insertOne(service)
+            res.json(result)
+        } )
+
+        // get all orders
+        app.get('/orders', async (req, res)=>{
+            const cursor = orderCollection.find({})
+            const orders = await cursor.toArray()
+            res.json(orders)
+        })
+
+      
+
+        // delete orders
+        app.delete('/orders/:id', async (req , res)=> {
+            const id  = req.params.id;
+            const query = {_id:ObjectId(id)}
+            const result = await orderCollection.deleteOne(query)
+            res.json(result)
+
+        })
+
+        //  post user data 
         app.post('/users', async (req, res)=>{
             const user = req.body;
             const result = await usersCollcectiion.insertOne(user)
@@ -68,7 +80,7 @@ async function  run(){
             const result = await usersCollcectiion.updateOne(filter, updateDoc, options)
             res.json(result)
           })
-
+ 
           app.put('/users/admin', async (req, res)=>{
             const user = req.body;
             const filter = {email: user.email};
@@ -76,14 +88,24 @@ async function  run(){
             const result = await usersCollcectiion.updateOne(filter, updateDoc)
             res.json(result)
           })
-      
+
+          app.get('/users/:email', async (req, res)=>{
+            const email = req.params.email
+            const query ={email:email}
+            const user = await usersCollcectiion.findOne(query)
+            let isAdmin= false;
+            if(user?.role ==='admin'){
+              isAdmin= true;
+            }
+            res.json({admin:isAdmin})
+          })
+
 
     }
     finally{
         // await client.close();
     }
 }
-
 run().catch(console.dir)
 
 
@@ -93,4 +115,4 @@ app.get('/', (req, res)=>{
 
 app.listen(port, ()=>{
 console.log('Running my curd operation server')
-})
+}) 
