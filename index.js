@@ -32,7 +32,7 @@ async function  run(){
         })
         // get all reviews collection 
         app.get('/reviews', async(req, res)=>{
-            const cursor = cctvCollection.find({});
+            const cursor = reviewsCollection.find({});
             const reviews = await cursor.toArray()
             res.send(reviews)
         })
