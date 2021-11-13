@@ -12,7 +12,6 @@ app.use(cors())
 app.use(express.json())
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.pp3lw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
-console.log(uri)
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 async function  run(){
@@ -23,6 +22,7 @@ async function  run(){
         const cctvCollection = database.collection('cctv')
         const usersCollcectiion=database.collection('users')
         const orderCollection = database.collection('orders')
+        const reviewsCollection = database.collection('reviews')
 
         // get all cctv collection 
         app.get('/cctv', async(req, res)=>{
@@ -44,6 +44,14 @@ async function  run(){
             const service = req.body;
             const result = await cctvCollection.insertOne(service)
             res.json(result)
+        } )
+
+        // add new review collection 
+        app.post('/reviews', async (req, res)=>{
+            const service = req.body;
+            const result = await reviewsCollection.insertOne(service)
+            res.json(result)
+            console.log(reslut)
         } )
 
         // get all orders
