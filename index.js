@@ -30,6 +30,12 @@ async function  run(){
             const cctv = await cursor.toArray()
             res.send(cctv)
         })
+        // get all reviews collection 
+        app.get('/reviews', async(req, res)=>{
+            const cursor = cctvCollection.find({});
+            const reviews = await cursor.toArray()
+            res.send(reviews)
+        })
 
         // POST new orders 
         app.post('/orders', async(req, res)=>{
