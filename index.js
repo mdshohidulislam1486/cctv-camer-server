@@ -51,7 +51,7 @@ async function  run(){
             const result = await cctvCollection.insertOne(service)
             res.json(result)
         } )
-
+        
         // add new review collection 
         app.post('/reviews', async (req, res)=>{
             const service = req.body;
